@@ -1,0 +1,69 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: reservation-http-api
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/reservation_db}
+      database: ${MONGODB_DATABASE:reservation_db}
+
+# Swagger/OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    try-it-out-enabled: true
+    filter: true
+    show-extensions: true
+    show-common-extensions: true
+    operations-sorter: method
+    tags-sorter: alpha
+    doc-expansion: none
+    default-models-expand-depth: 1
+    default-model-expand-depth: 1
+  show-actuator: false
+  group-configs:
+    - group: 'reservation-api'
+      paths-to-match: '/api/**'
+      packages-to-scan: 'com.reztech.reservation_http_api.controller'
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    mongo:
+      enabled: true
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+logging:
+  level:
+    com.reztech: ${LOG_LEVEL:INFO}
+    org.springframework.data.mongodb: ${MONGODB_LOG_LEVEL:WARN}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+app:
+  config:
+    default-page-size: ${DEFAULT_PAGE_SIZE:20}
+    max-page-size: ${MAX_PAGE_SIZE:100}
+    timezone: ${APP_TIMEZONE:Europe/Istanbul} 
