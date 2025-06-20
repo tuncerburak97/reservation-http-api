@@ -11,6 +11,8 @@ import org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventL
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import java.util.concurrent.TimeUnit;
+
 import static java.util.Collections.singletonList;
 
 /**
@@ -66,5 +68,16 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
                 .applyToClusterSettings(settings  -> {
                     settings.hosts(singletonList(new ServerAddress(host, port)));
                 });
+
+        builder.applyToConnectionPoolSettings(settings -> {
+
+            settings.maxConnectionLifeTime(2000, TimeUnit.MILLISECONDS)
+                    .minSize(10)//pool
+                    .maxSize(100)//pool
+                    .maintenanceFrequency(10, TimeUnit.MILLISECONDS)
+                    .maintenanceInitialDelay(11, TimeUnit.MILLISECONDS)
+                    .maxConnectionIdleTime(30, TimeUnit.SECONDS)
+                    .maxWaitTime(15, TimeUnit.MILLISECONDS);
+        });
     }
 } 
