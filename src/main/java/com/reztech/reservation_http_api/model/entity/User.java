@@ -25,9 +25,9 @@ public class User {
     
     private String surname;
     
-    @Indexed
+    //@Indexed
     private String gsm;
     
-    @Indexed(unique = true)
+    //@Indexed(unique = true)
     private String email;
 } 

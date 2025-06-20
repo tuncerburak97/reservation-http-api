@@ -22,26 +22,29 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @Document(collection = "reservations")
+/*
 @CompoundIndexes({
     @CompoundIndex(name = "business_date_timeslot", def = "{'business.id': 1, 'reservationDate': 1, 'timeSlot.startTime': 1}", unique = true),
     @CompoundIndex(name = "user_date", def = "{'user.id': 1, 'reservationDate': 1}"),
     @CompoundIndex(name = "business_date", def = "{'business.id': 1, 'reservationDate': 1}")
 })
+
+ */
 public class Reservation {
     
     @Id
     private String id;
     
-    @Indexed
+    //@Indexed
     private User user;
     
-    @Indexed
+    //@Indexed
     private Business business;
     
     /**
      * Date of the reservation
      */
-    @Indexed
+    //@Indexed
     private LocalDate reservationDate;
     
     /**
@@ -53,21 +56,21 @@ public class Reservation {
      * Status of the reservation slot
      */
     @Builder.Default
-    @Indexed
+    //@Indexed
     private SlotStatus status = SlotStatus.BOOKED;
     
     /**
      * Confirmation status
      */
     @Builder.Default
-    @Indexed
+    //@Indexed
     private Boolean isConfirmed = false;
     
     /**
      * Cancellation status
      */
     @Builder.Default
-    @Indexed
+    //@Indexed
     private Boolean isCancelled = false;
     
     /**
@@ -80,7 +83,7 @@ public class Reservation {
      */
     private String notes;
     
-    @Indexed
+    //@Indexed
     private Instant createdAt;
     
     private Instant updatedAt;

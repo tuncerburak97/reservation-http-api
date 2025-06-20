@@ -22,13 +22,13 @@ public class Business {
     @Id
     private String id;
     
-    @TextIndexed(weight = 2)
-    @Indexed
+    //@TextIndexed(weight = 2)
+    //@Indexed
     private String name;
     
     private Location location;
     
-    @Indexed
+    //@Indexed
     private Owner owner;
     
     private ContactInfo contactInfo;

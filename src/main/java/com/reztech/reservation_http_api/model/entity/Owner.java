@@ -26,12 +26,12 @@ public class Owner {
     
     private String lastname;
     
-    @Indexed
+    //@Indexed
     private String gsm;
     
-    @Indexed(unique = true)
+    //@Indexed(unique = true)
     private String email;
     
-    @Indexed
+    //@Indexed
     private OwnerType ownerType;
 } 
