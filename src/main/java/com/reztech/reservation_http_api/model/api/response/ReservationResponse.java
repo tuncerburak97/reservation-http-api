@@ -1,7 +1,7 @@
 package com.reztech.reservation_http_api.model.api.response;
 
-import com.reztech.reservation_http_api.model.entity.Business;
-import com.reztech.reservation_http_api.model.entity.User;
+import com.reztech.reservation_http_api.model.entity.main.business.Business;
+import com.reztech.reservation_http_api.model.entity.main.user.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,7 +1,7 @@
 package com.reztech.reservation_http_api.model.api.request;
 
-import com.reztech.reservation_http_api.model.entity.ContactInfo;
-import com.reztech.reservation_http_api.model.entity.Location;
+import com.reztech.reservation_http_api.model.entity.embedded.ContactInfo;
+import com.reztech.reservation_http_api.model.entity.embedded.Location;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

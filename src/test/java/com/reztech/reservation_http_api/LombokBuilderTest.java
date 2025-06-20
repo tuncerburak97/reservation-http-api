@@ -1,8 +1,8 @@
 package com.reztech.reservation_http_api;
 
-import com.reztech.reservation_http_api.model.entity.TimeSlot;
-import com.reztech.reservation_http_api.model.entity.User;
-import com.reztech.reservation_http_api.model.entity.Owner;
+import com.reztech.reservation_http_api.model.entity.embedded.TimeSlot;
+import com.reztech.reservation_http_api.model.entity.main.user.User;
+import com.reztech.reservation_http_api.model.entity.main.business.Owner;
 import com.reztech.reservation_http_api.model.enums.OwnerType;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

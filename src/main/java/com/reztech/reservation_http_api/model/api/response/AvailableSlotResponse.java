@@ -1,6 +1,6 @@
 package com.reztech.reservation_http_api.model.api.response;
 
-import com.reztech.reservation_http_api.model.entity.TimeSlot;
+import com.reztech.reservation_http_api.model.entity.embedded.TimeSlot;
 import com.reztech.reservation_http_api.model.enums.SlotStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

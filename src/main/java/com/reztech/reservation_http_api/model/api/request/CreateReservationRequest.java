@@ -1,7 +1,6 @@
 package com.reztech.reservation_http_api.model.api.request;
 
-import com.reztech.reservation_http_api.annotation.validator.FutureDate;
-import com.reztech.reservation_http_api.model.entity.TimeSlot;
+import com.reztech.reservation_http_api.model.entity.embedded.TimeSlot;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
