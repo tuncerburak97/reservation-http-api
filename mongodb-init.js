@@ -1,8 +1,22 @@
 // MongoDB Initialization Script
 // This script will be executed when MongoDB container starts for the first time
 
-// Switch to reservation database
+// First, create a user for reservation_db database
 db = db.getSiblingDB("reservation_db");
+
+// Create application user for reservation_db
+db.createUser({
+  user: "reservation_user",
+  pwd: "reservation_pass",
+  roles: [
+    {
+      role: "readWrite",
+      db: "reservation_db",
+    },
+  ],
+});
+
+print("Created reservation_user for reservation_db database");
 
 // Create collections (optional - they will be created automatically when first document is inserted)
 db.createCollection("users");

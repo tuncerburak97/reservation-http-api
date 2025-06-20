@@ -1,5 +1,9 @@
 package com.reztech.reservation_http_api.config;
 
+import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
@@ -7,12 +11,23 @@ import org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventL
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import static java.util.Collections.singletonList;
+
 /**
  * MongoDB configuration class with auto-indexing and validation
  */
 @Configuration
 @EnableMongoRepositories(basePackages = "com.reztech.reservation_http_api.repository")
 public class MongoConfig extends AbstractMongoClientConfiguration {
+
+    @Value("${spring.data.mongodb.host}")
+    private String host;
+    @Value("${spring.data.mongodb.port}")
+    private int port;
+    @Value("${spring.data.mongodb.username}")
+    private String username;
+    @Value("${spring.data.mongodb.password}")
+    private String password;
 
     @Override
     protected String getDatabaseName() {
@@ -41,5 +56,15 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     @Override
     protected boolean autoIndexCreation() {
         return true;
+    }
+
+
+    @Override
+    protected void configureClientSettings(MongoClientSettings.Builder builder) {
+        builder
+                .credential(MongoCredential.createCredential(username, getDatabaseName(), password.toCharArray()))
+                .applyToClusterSettings(settings  -> {
+                    settings.hosts(singletonList(new ServerAddress(host, port)));
+                });
     }
 } 

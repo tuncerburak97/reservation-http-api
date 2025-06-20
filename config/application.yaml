@@ -6,8 +6,12 @@ spring:
     name: reservation-http-api
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://admin:admin123@localhost:27017/reservation_db?authSource=admin}
+      uri: ${MONGODB_URI:mongodb://reservation_user:reservation_pass@localhost:27017/reservation_db}
       database: ${MONGODB_DATABASE:reservation_db}
+      host: localhost
+      port: 27017
+      username: reservation_user
+      password: reservation_pass
 
 # Swagger/OpenAPI Configuration
 springdoc:
