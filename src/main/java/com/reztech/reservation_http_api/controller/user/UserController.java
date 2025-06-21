@@ -2,6 +2,7 @@ package com.reztech.reservation_http_api.controller.user;
 
 import com.reztech.reservation_http_api.model.api.request.CreateUserRequest;
 import com.reztech.reservation_http_api.model.entity.main.user.User;
+import com.reztech.reservation_http_api.model.entity.main.business.Business;
 import com.reztech.reservation_http_api.model.enums.UserType;
 import com.reztech.reservation_http_api.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -265,6 +266,39 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
     
+    /**
+     * Find businesses where user is an employee
+     * @param userId User ID
+     * @return List of businesses where user is an employee
+     */
+    @GetMapping("/{userId}/businesses")
+    @Operation(
+        summary = "Find businesses where user is an employee",
+        description = "Retrieves a list of businesses where the specified user is an active employee or partner"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Businesses found successfully",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Business.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "User not found"
+        )
+    })
+    public ResponseEntity<List<Business>> findBusinessesByEmployeeUserId(
+        @Parameter(description = "User ID", required = true, example = "6507c123456789abcdef0002")
+        @PathVariable String userId
+    ) {
+        log.info("Find businesses by employee user id request received for userId: {}", userId);
+        List<Business> businesses = userService.findBusinessesByEmployeeUserId(userId);
+        return ResponseEntity.ok(businesses);
+    }
+
     /**
      * Delete user by ID
      * @param id User ID

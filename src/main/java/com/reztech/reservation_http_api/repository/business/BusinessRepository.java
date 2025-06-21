@@ -27,4 +27,21 @@ public interface BusinessRepository extends MongoRepository<Business, String> {
      * @return List of businesses
      */
     List<Business> findByNameContainingIgnoreCase(String name);
+    
+    /**
+     * Find businesses where user is an employee
+     * @param userId User ID
+     * @return List of businesses
+     */
+    @Query("{'employees.userId': ?0, 'employees.active': true}")
+    List<Business> findByEmployeeUserId(String userId);
+    
+    /**
+     * Find businesses where user is an employee with specific role
+     * @param userId User ID
+     * @param role Employee role
+     * @return List of businesses
+     */
+    @Query("{'employees.userId': ?0, 'employees.role': ?1, 'employees.active': true}")
+    List<Business> findByEmployeeUserIdAndRole(String userId, String role);
 } 

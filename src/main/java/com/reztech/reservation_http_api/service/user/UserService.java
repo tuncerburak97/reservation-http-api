@@ -8,6 +8,8 @@ import com.reztech.reservation_http_api.model.api.request.CreateUserRequest;
 import com.reztech.reservation_http_api.model.entity.main.user.User;
 import com.reztech.reservation_http_api.model.enums.UserType;
 import com.reztech.reservation_http_api.repository.user.UserRepository;
+import com.reztech.reservation_http_api.repository.business.BusinessRepository;
+import com.reztech.reservation_http_api.model.entity.main.business.Business;
 import com.reztech.reservation_http_api.util.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import java.util.List;
 public class UserService {
     
     private final UserRepository userRepository;
+    private final BusinessRepository businessRepository;
     private final JsonUtils jsonUtils;
     
     /**
@@ -138,6 +141,18 @@ public class UserService {
                     String.format("User not found with email: %s and type: %s", email, userType)));
     }
     
+    /**
+     * Find businesses where user is an employee
+     * @param userId User ID
+     * @return List of businesses where user is an employee
+     */
+    public List<Business> findBusinessesByEmployeeUserId(String userId) {
+        log.info("Finding businesses where user {} is an employee", userId);
+        
+        // Use optimized repository method
+        return businessRepository.findByEmployeeUserId(userId);
+    }
+
     /**
      * Delete user by ID
      * @param id User ID

@@ -1,5 +1,6 @@
 package com.reztech.reservation_http_api.model.entity.main.business;
 
+import com.reztech.reservation_http_api.model.entity.embedded.BusinessEmployee;
 import com.reztech.reservation_http_api.model.entity.embedded.ContactInfo;
 import com.reztech.reservation_http_api.model.entity.embedded.Location;
 import com.reztech.reservation_http_api.model.entity.main.user.User;
@@ -9,6 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Business entity for reservation system
@@ -34,10 +38,12 @@ public class Business {
     private Location location;
     
     //@Indexed
-    //TODO
-    // List<Worker> workers; Bu workerlardan biri OWNER tipinde olabilir. ( OWNER == USER_ADMIN )
     //TODO OWNER sisteme yeni kullanıcı ekler ve siler.
     private User owner;
+    
+    // List of employees/partners working for this business
+    @Builder.Default
+    private List<BusinessEmployee> employees = new ArrayList<>();
     
     private ContactInfo contactInfo;
 } 
