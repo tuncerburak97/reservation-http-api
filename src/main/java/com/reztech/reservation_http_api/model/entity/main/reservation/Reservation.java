@@ -87,4 +87,9 @@ public class Reservation {
     private Instant createdAt;
     
     private Instant updatedAt;
+
+    //TODO updateBy bilgisi : Business owner / user
+    //TODO createdBy bilgisi : Business owner/ user
+
+    //TODO Rezervasyonları saaat aralıkları olmalı
 } 

@@ -39,7 +39,8 @@ public class ReservationService {
      */
     public ReservationResponse createReservation(CreateReservationRequest request) {
         log.info("Creating reservation for user {} and business {}", request.getUserId(), request.getBusinessId());
-        
+
+        //TODO user üye olmadan da rezervasyon yapabilir.
         // Find user and business
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND, 
@@ -48,8 +49,9 @@ public class ReservationService {
         Business business = businessRepository.findById(request.getBusinessId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.BUSINESS_NOT_FOUND, 
                     String.format(ErrorMessage.BUSINESS_NOT_FOUND, request.getBusinessId())));
-        
-        // Create reservation
+
+        //TODO rezervsayon uygunlu kontrol et
+        // reservation saat bilgisi anlaşılır mı
         Reservation reservation = Reservation.builder()
                 .user(user)
                 .business(business)
@@ -71,7 +73,7 @@ public class ReservationService {
      */
     public ReservationResponse updateReservation(String id, CreateReservationRequest request) {
         log.info("Updating reservation with id: {}", id);
-        
+        //TODO güncelleme için uygunluk kontrolü yap
         Reservation existingReservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
         

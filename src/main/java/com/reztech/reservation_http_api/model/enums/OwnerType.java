@@ -5,5 +5,5 @@ package com.reztech.reservation_http_api.model.enums;
  */
 public enum OwnerType {
     ADMIN,
-    NORMAL_USER
+    NORMAL_USER // TODO enu rename => UserRole , EMPLOYEE, OWNER, ADMIN // TODO : ADMIN = BİZ OLMALIYIZ
 } 

@@ -25,10 +25,17 @@ public class Business {
     //@TextIndexed(weight = 2)
     //@Indexed
     private String name;
+
+    //TODO sektör collectionu içerebilir
+    // private Sektör string ( Sektör yönetimi bizim tarafımızdan olmalı)
+    // Business : {Berber, Güzellik Merkezi ,Diş Polikilinliği ...vs}
     
     private Location location;
     
     //@Indexed
+    //TODO
+    // List<Worker> workers; Bu workerlardan biri OWNER tipinde olabilir. ( OWNER == USER_ADMIN )
+    //TODO OWNER sisteme yeni kullanıcı ekler ve siler.
     private Owner owner;
     
     private ContactInfo contactInfo;

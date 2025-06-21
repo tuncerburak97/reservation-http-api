@@ -29,4 +29,15 @@ public class User {
     
     //@Indexed(unique = true)
     private String email;
+
+    //private UserRole role; // CUSTOMER, EMPLOYEE, OWNER
+    //TODO password bilgisi olabilir mi ?
+
+    //TODO kullanıcı üye olduysa eğer
+    // verified
+
+    // TODO Business kullanıcı tanımı yapılabilir
+    //TODO Roller OWNER => WORKER1, WORKER2
+    // Owner collectionu da kaldırılabilir bu collection kullanılabilir.
+    // Müşteriler (Hizmet alanlar için Customer collectionu oluşturabilir)
 } 

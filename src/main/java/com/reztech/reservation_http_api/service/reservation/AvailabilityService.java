@@ -198,6 +198,7 @@ public class AvailabilityService {
         }
         
         // Check availability rules (blocked slots have priority)
+        //TODO iç içe çok fazla sorgu var
         for (BusinessAvailability rule : availabilityRules) {
             if (rule.getBlockedSlots() != null) {
                 for (TimeSlot blockedSlot : rule.getBlockedSlots()) {

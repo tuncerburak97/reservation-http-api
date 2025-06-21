@@ -35,7 +35,9 @@ public class BusinessService {
         // Find owner
         Owner owner = ownerRepository.findById(request.getOwnerId())
                 .orElseThrow(() -> new RuntimeException("Owner not found with id: " + request.getOwnerId()));
-        
+
+        //TODO mapStruct kullan
+        //TODO gerekli doğrulamalar yapıldı mı kontrol edilmelidir? Örnek: mail, sms ..vs
         Business business = Business.builder()
                 .name(request.getName())
                 .location(request.getLocation())

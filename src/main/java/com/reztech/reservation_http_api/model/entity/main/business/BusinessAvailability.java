@@ -88,4 +88,10 @@ public class BusinessAvailability {
     private Instant createdAt;
     
     private Instant updatedAt;
+
+    // TODO bu colleciton işletme özelinde uygunluk zamanlarını yönetebiliyor.( Çalışanlara göre olabilir)
+    // TODO USER (OWNER) lar için yönetilebilir olabilir
+    // Bir berberde 3 kişi çalışıyor olabilir. Bu kişiler çalışma saatlerini kendisi belirlemelidir
+
+
 } 
