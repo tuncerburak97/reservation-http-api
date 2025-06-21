@@ -1,7 +1,9 @@
 package com.reztech.reservation_http_api.model.api.response;
 
+import com.reztech.reservation_http_api.model.entity.embedded.TimeSlot;
 import com.reztech.reservation_http_api.model.entity.main.business.Business;
 import com.reztech.reservation_http_api.model.entity.main.user.User;
+import com.reztech.reservation_http_api.model.enums.SlotStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 /**
  * Response DTO for reservations
@@ -29,8 +32,29 @@ public class ReservationResponse {
     @Schema(description = "Business where the reservation is made")
     private Business business;
     
-    @Schema(description = "Date and time of the reservation", example = "2024-12-25T10:00:00Z")
-    private Instant reservationDate;
+    @Schema(description = "Date of the reservation", example = "2024-12-25")
+    private LocalDate reservationDate;
+    
+    @Schema(description = "Time slot for the reservation")
+    private TimeSlot timeSlot;
+    
+    @Schema(description = "User ID of the assigned employee for this reservation", example = "6507c123456789abcdef0004")
+    private String assignedEmployeeUserId;
+    
+    @Schema(description = "Status of the reservation slot", example = "BOOKED")
+    private SlotStatus status;
+    
+    @Schema(description = "Whether the reservation is confirmed", example = "false")
+    private Boolean isConfirmed;
+    
+    @Schema(description = "Whether the reservation is cancelled", example = "false")
+    private Boolean isCancelled;
+    
+    @Schema(description = "Cancellation reason if cancelled", example = "Customer requested cancellation")
+    private String cancellationReason;
+    
+    @Schema(description = "Additional notes for the reservation", example = "Saç kesimi istiyorum")
+    private String notes;
     
     @Schema(description = "Date and time when the reservation was created", example = "2024-12-20T14:30:00Z")
     private Instant createdAt;

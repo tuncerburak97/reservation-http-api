@@ -32,7 +32,6 @@ public class CreateReservationRequest {
     private String businessId;
     
     @NotNull(message = "Reservation date is required")
-    @Future(message = "Reservation date must be in the future")
     @Schema(description = "Date of the reservation", example = "2024-12-25", required = true, type = "string", format = "date")
     private LocalDate reservationDate;
     
@@ -40,6 +39,9 @@ public class CreateReservationRequest {
     @Valid
     @Schema(description = "Time slot for the reservation", required = true)
     private TimeSlot timeSlot;
+    
+    @Schema(description = "User ID of the assigned employee for this reservation", example = "6507c123456789abcdef0004")
+    private String assignedEmployeeUserId;
     
     @Schema(description = "Additional notes for the reservation", example = "Saç kesimi istiyorum")
     private String notes;

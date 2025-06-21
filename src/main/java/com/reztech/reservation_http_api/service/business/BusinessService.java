@@ -1,6 +1,7 @@
 package com.reztech.reservation_http_api.service.business;
 
 import com.reztech.reservation_http_api.model.api.request.CreateBusinessRequest;
+import com.reztech.reservation_http_api.model.entity.embedded.BusinessEmployee;
 import com.reztech.reservation_http_api.model.entity.main.business.Business;
 import com.reztech.reservation_http_api.model.entity.main.user.User;
 import com.reztech.reservation_http_api.model.enums.UserType;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -45,7 +47,27 @@ public class BusinessService {
         Business business = jsonUtils.convert(request, Business.class);
         business.setOwner(owner);
         
+        // Add owner as default employee
+        addOwnerAsEmployee(business, owner);
+        
         return businessRepository.save(business);
+    }
+    
+    /**
+     * Add business owner as default employee
+     * @param business Business entity
+     * @param owner Business owner
+     */
+    private void addOwnerAsEmployee(Business business, User owner) {
+        BusinessEmployee ownerEmployee = BusinessEmployee.builder()
+                .userId(owner.getId())
+                .joinedAt(LocalDateTime.now())
+                .active(true)
+                .isOwner(true)
+                .build();
+        
+        business.getEmployees().add(ownerEmployee);
+        log.info("Added owner {} as default employee for business {}", owner.getId(), business.getName());
     }
     
     /**

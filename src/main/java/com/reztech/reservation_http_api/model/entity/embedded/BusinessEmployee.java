@@ -24,4 +24,8 @@ public class BusinessEmployee {
     
     // Is employee active
     private boolean active;
+    
+    // Is this employee the business owner
+    @Builder.Default
+    private boolean isOwner = false;
 }

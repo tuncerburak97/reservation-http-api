@@ -53,6 +53,11 @@ public class Reservation {
     private TimeSlot timeSlot;
     
     /**
+     * The assigned employee userId for this reservation
+     */
+    private String assignedEmployeeUserId;
+    
+    /**
      * Status of the reservation slot
      */
     @Builder.Default

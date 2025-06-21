@@ -177,12 +177,9 @@ public class BusinessEmployeeService {
         log.info("Checking if user {} is employee of business {}", userId, businessId);
         
         Optional<Business> businessOpt = businessRepository.findById(businessId);
-        if (businessOpt.isEmpty()) {
-            return false;
-        }
-        
-        return businessOpt.get().getEmployees().stream()
-                .anyMatch(emp -> emp.getUserId().equals(userId) && emp.isActive());
+        return businessOpt.map(business -> business.getEmployees().stream()
+                .anyMatch(emp -> emp.getUserId().equals(userId) && emp.isActive())).orElse(false);
+
     }
     
     /**
@@ -195,7 +192,6 @@ public class BusinessEmployeeService {
                 .userId(employee.getUserId())
                 .joinedAt(employee.getJoinedAt())
                 .active(employee.isActive())
-
                 .build();
     }
 } 

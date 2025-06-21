@@ -36,6 +36,9 @@ public class AvailableSlotResponse {
     @Schema(description = "List of booked time slots")
     private List<SlotInfo> bookedSlots;
     
+    @Schema(description = "All time slots combined, sorted by time (ascending)")
+    private List<SlotInfo> slots;
+    
     /**
      * Slot information with status
      */
@@ -56,5 +59,11 @@ public class AvailableSlotResponse {
         
         @Schema(description = "Whether this slot can be booked", example = "true")
         private Boolean isBookable;
+        
+        @Schema(description = "List of available employee user IDs for this slot")
+        private List<String> availableEmployeeUserIds;
+        
+        @Schema(description = "Reserved employee user ID (if booked)")
+        private String reservedEmployeeUserId;
     }
 } 
