@@ -38,6 +38,7 @@ public class UserService {
         log.info("Creating user with email: {}", request.getEmail());
         
         // Check if user already exists with same email
+        //TODO check if user already exists with same gsm
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new BusinessException(ErrorCode.USER_EMAIL_ALREADY_EXISTS, 
                 String.format(ErrorMessage.USER_ALREADY_EXISTS, request.getEmail()));

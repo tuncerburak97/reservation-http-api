@@ -138,7 +138,8 @@ public class BusinessEmployeeService {
         // Find business
         Business business = businessRepository.findById(businessId)
                 .orElseThrow(() -> new RuntimeException("Business not found with id: " + businessId));
-        
+
+        //TODO put user details into response
         // Convert to response objects
         return business.getEmployees().stream()
                 .map(this::convertToResponse)
@@ -163,7 +164,8 @@ public class BusinessEmployeeService {
                 .filter(emp -> emp.getUserId().equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Employee not found in business"));
-        
+
+        //TODO put user details into response
         return convertToResponse(employee);
     }
     

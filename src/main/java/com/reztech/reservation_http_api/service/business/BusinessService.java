@@ -81,6 +81,10 @@ public class BusinessService {
         
         Business existingBusiness = businessRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Business not found with id: " + id));
+
+        //TODO business hakkındaki güncellemeyi sadece BUSINESS_OWNER statusündeki kullanıcı yapabilir.
+        // Requestten gelen userId -> existingBusiness içerisindeki userId ile eşit mi ve userType == BUSINESS_OWNER kontrolü yapılmalıdır/
+        // Bu işlem için yetki yok hatası
         
         // Update fields
         if (request.getName() != null) {

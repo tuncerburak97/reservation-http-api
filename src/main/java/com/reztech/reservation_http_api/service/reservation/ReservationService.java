@@ -55,8 +55,6 @@ public class ReservationService {
         // Validate assigned employee if provided
         String assignedEmployeeUserId = validateAndGetAssignedEmployee(request, business);
 
-        //TODO rezervsayon uygunlu kontrol et
-        // Check availability for the specific employee and time slot
         validateReservationAvailability(request, assignedEmployeeUserId);
         
         // reservation saat bilgisi anlaşılır mı
@@ -139,7 +137,8 @@ public class ReservationService {
      */
     public ReservationResponse updateReservation(String id, CreateReservationRequest request) {
         log.info("Updating reservation with id: {}", id);
-        //TODO güncelleme için uygunluk kontrolü yap
+        //TODO güncelleme için uygunluk kontrolü yap => yeni saatler için uygunluk var mı?
+        //TODO isCancel statu update
         Reservation existingReservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
         

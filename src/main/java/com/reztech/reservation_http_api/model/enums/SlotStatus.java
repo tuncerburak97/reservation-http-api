@@ -6,7 +6,8 @@ package com.reztech.reservation_http_api.model.enums;
 public enum SlotStatus {
     AVAILABLE,    // Slot is available for booking
     BOOKED,       // Slot is already booked
-    BLOCKED       // Slot is blocked by business owner
+    BLOCKED,
+    EXPIRED       // Slot is blocked by business owner
 }
 
 /* TODO slot statuler genişletilebililir

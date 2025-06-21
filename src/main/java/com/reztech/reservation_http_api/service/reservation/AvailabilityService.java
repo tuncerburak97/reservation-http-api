@@ -69,15 +69,70 @@ public class AvailabilityService {
         List<AvailableSlotResponse.SlotInfo> availableSlots = new ArrayList<>();
         List<AvailableSlotResponse.SlotInfo> blockedSlots = new ArrayList<>();
         List<AvailableSlotResponse.SlotInfo> bookedSlots = new ArrayList<>();
+        List<AvailableSlotResponse.SlotInfo> expiredSlots = new ArrayList<>();
         
         for (TimeSlot slot : allPossibleSlots) {
-            AvailableSlotResponse.SlotInfo slotInfo = determineSlotStatusWithEmployees(
-                    slot, availabilityRules, existingReservations, activeEmployees, date);
+            // Check if slot is blocked by business rules first
+            boolean isBlockedByRules = isSlotBlockedByRules(slot, availabilityRules);
             
-            switch (slotInfo.getStatus()) {
-                case AVAILABLE -> availableSlots.add(slotInfo);
-                case BLOCKED -> blockedSlots.add(slotInfo);
-                case BOOKED -> bookedSlots.add(slotInfo);
+            if (isBlockedByRules) {
+                blockedSlots.add(createBlockedSlotInfo(slot, availabilityRules));
+                continue;
+            }
+            
+            // Check if slot is in the past
+            if (isSlotInPast(slot, date)) {
+                expiredSlots.add(createPastSlotInfo(slot, date));
+                continue;
+            }
+            
+            // If no active employees, mark as blocked
+            if (activeEmployees.isEmpty()) {
+                blockedSlots.add(createNoEmployeesSlotInfo(slot));
+                continue;
+            }
+            
+            // Check each employee's availability for this slot
+            List<String> availableEmployeeUserIds = new ArrayList<>();
+            List<String> reservedEmployeeUserIds = new ArrayList<>();
+            
+            for (BusinessEmployee employee : activeEmployees) {
+                boolean isEmployeeBooked = existingReservations.stream()
+                        .anyMatch(reservation -> 
+                                reservation.getTimeSlot() != null && 
+                                reservation.getTimeSlot().overlaps(slot) &&
+                                employee.getUserId().equals(reservation.getAssignedEmployeeUserId()));
+                
+                if (isEmployeeBooked) {
+                    reservedEmployeeUserIds.add(employee.getUserId());
+                } else {
+                    availableEmployeeUserIds.add(employee.getUserId());
+                }
+            }
+            
+            // Create separate slot entries for available and booked employees
+            if (!availableEmployeeUserIds.isEmpty()) {
+                // Add slot for available employees
+                availableSlots.add(AvailableSlotResponse.SlotInfo.builder()
+                        .timeSlot(slot)
+                        .status(SlotStatus.AVAILABLE)
+                        .reason(null)
+                        .isBookable(true)
+                        .availableEmployeeUserIds(availableEmployeeUserIds)
+                        .reservedEmployeeUserIds(reservedEmployeeUserIds)
+                        .build());
+            }
+            
+            if (!reservedEmployeeUserIds.isEmpty()) {
+                // Add slot for booked employees
+                bookedSlots.add(AvailableSlotResponse.SlotInfo.builder()
+                        .timeSlot(slot)
+                        .status(SlotStatus.BOOKED)
+                        .reason("Employee(s) have existing reservations")
+                        .isBookable(false)
+                        .availableEmployeeUserIds(availableEmployeeUserIds)
+                        .reservedEmployeeUserIds(reservedEmployeeUserIds)
+                        .build());
             }
         }
         
@@ -85,12 +140,14 @@ public class AvailabilityService {
         availableSlots.sort(Comparator.comparing(s -> s.getTimeSlot().getStartTime()));
         blockedSlots.sort(Comparator.comparing(s -> s.getTimeSlot().getStartTime()));
         bookedSlots.sort(Comparator.comparing(s -> s.getTimeSlot().getStartTime()));
+        expiredSlots.sort(Comparator.comparing(s -> s.getTimeSlot().getStartTime()));
         
         // Combine all slots into a single sorted list
         List<AvailableSlotResponse.SlotInfo> allSlots = new ArrayList<>();
         allSlots.addAll(availableSlots);
         allSlots.addAll(blockedSlots);
         allSlots.addAll(bookedSlots);
+        allSlots.addAll(expiredSlots);
         
         // Sort combined list by start time
         allSlots.sort((s1, s2) -> s1.getTimeSlot().getStartTime().compareTo(s2.getTimeSlot().getStartTime()));
@@ -101,6 +158,7 @@ public class AvailabilityService {
                 .availableSlots(availableSlots)
                 .blockedSlots(blockedSlots)
                 .bookedSlots(bookedSlots)
+                .expiredSlots(expiredSlots)
                 .slots(allSlots)
                 .build();
     }
@@ -227,141 +285,96 @@ public class AvailabilityService {
     }
     
     /**
-     * Determine the status of a specific time slot with employee availability
-     * @param slot Time slot to check
-     * @param availabilityRules Availability rules
-     * @param existingReservations Existing reservations
-     * @param activeEmployees Active employees
-     * @param queryDate Date being queried for availability
-     * @return Slot information with status and employee availability
+     * Check if slot is blocked by business availability rules
      */
-    private AvailableSlotResponse.SlotInfo determineSlotStatusWithEmployees(
-            TimeSlot slot, 
-            List<BusinessAvailability> availabilityRules,
-            List<Reservation> existingReservations,
-            List<BusinessEmployee> activeEmployees,
-            LocalDate queryDate) {
-        
-        // Check if the time slot is in the past
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
-        
-        // If query date is in the past, all slots are blocked
-        if (queryDate.isBefore(currentDate)) {
-            return AvailableSlotResponse.SlotInfo.builder()
-                    .timeSlot(slot)
-                    .status(SlotStatus.BLOCKED)
-                    .reason("Date has already passed")
-                    .isBookable(false)
-                    .availableEmployeeUserIds(new ArrayList<>())
-                    .build();
-        }
-        
-        // If query date is today, check if time slot has passed
-        if (queryDate.equals(currentDate) && slot.getStartTime().isBefore(currentTime)) {
-            return AvailableSlotResponse.SlotInfo.builder()
-                    .timeSlot(slot)
-                    .status(SlotStatus.BLOCKED)
-                    .reason("Time slot has already passed")
-                    .isBookable(false)
-                    .availableEmployeeUserIds(new ArrayList<>())
-                    .build();
-        }
-        
-        // If no active employees, mark as blocked
-        if (activeEmployees.isEmpty()) {
-            return AvailableSlotResponse.SlotInfo.builder()
-                    .timeSlot(slot)
-                    .status(SlotStatus.BLOCKED)
-                    .reason("No active employees available")
-                    .isBookable(false)
-                    .availableEmployeeUserIds(new ArrayList<>())
-                    .build();
-        }
-        
-        // Check which employees are available for this slot
-        List<String> availableEmployeeUserIds = new ArrayList<>();
-        String reservedEmployeeUserId = null;
-        
-        for (BusinessEmployee employee : activeEmployees) {
-            // Check if employee has an existing reservation at this time slot
-            boolean isEmployeeBooked = existingReservations.stream()
-                    .anyMatch(reservation -> 
-                            reservation.getTimeSlot() != null && 
-                            reservation.getTimeSlot().overlaps(slot) &&
-                            employee.getUserId().equals(reservation.getAssignedEmployeeUserId()));
-            
-            if (isEmployeeBooked) {
-                // Find which reservation has this employee
-                reservedEmployeeUserId = existingReservations.stream()
-                        .filter(reservation -> 
-                                reservation.getTimeSlot() != null && 
-                                reservation.getTimeSlot().overlaps(slot) &&
-                                employee.getUserId().equals(reservation.getAssignedEmployeeUserId()))
-                        .map(Reservation::getAssignedEmployeeUserId)
-                        .findFirst()
-                        .orElse(null);
-            } else {
-                // Employee is available for this slot
-                availableEmployeeUserIds.add(employee.getUserId());
-            }
-        }
-        
-        // Check availability rules (blocked slots have priority)
+    private boolean isSlotBlockedByRules(TimeSlot slot, List<BusinessAvailability> availabilityRules) {
         for (BusinessAvailability rule : availabilityRules) {
             if (rule.getBlockedSlots() != null) {
                 for (TimeSlot blockedSlot : rule.getBlockedSlots()) {
                     if (blockedSlot.overlaps(slot)) {
-                        return AvailableSlotResponse.SlotInfo.builder()
-                                .timeSlot(slot)
-                                .status(SlotStatus.BLOCKED)
-                                .reason(rule.getBlockReason() != null ? 
-                                        rule.getBlockReason() : "Blocked by business")
-                                .isBookable(false)
-                                .availableEmployeeUserIds(new ArrayList<>())
-                                .build();
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Check if slot is in the past
+     */
+    private boolean isSlotInPast(TimeSlot slot, LocalDate queryDate) {
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        
+        if (queryDate.isBefore(currentDate)) {
+            return true;
+        }
+        
+        return queryDate.equals(currentDate) && slot.getStartTime().isBefore(currentTime);
+    }
+    
+    /**
+     * Create blocked slot info for business rules
+     */
+    private AvailableSlotResponse.SlotInfo createBlockedSlotInfo(TimeSlot slot, List<BusinessAvailability> availabilityRules) {
+        String reason = "Blocked by business";
+        for (BusinessAvailability rule : availabilityRules) {
+            if (rule.getBlockedSlots() != null) {
+                for (TimeSlot blockedSlot : rule.getBlockedSlots()) {
+                    if (blockedSlot.overlaps(slot)) {
+                        reason = rule.getBlockReason() != null ? rule.getBlockReason() : "Blocked by business";
+                        break;
                     }
                 }
             }
         }
         
-        // If all employees are booked, mark as booked
-        if (availableEmployeeUserIds.isEmpty() && reservedEmployeeUserId != null) {
-            return AvailableSlotResponse.SlotInfo.builder()
-                    .timeSlot(slot)
-                    .status(SlotStatus.BOOKED)
-                    .reason("All employees are booked")
-                    .isBookable(false)
-                    .availableEmployeeUserIds(new ArrayList<>())
-                    .reservedEmployeeUserId(reservedEmployeeUserId)
-                    .build();
-        }
-        
-        // Check if slot is explicitly available (if there are availability rules)
-        if (!availabilityRules.isEmpty()) {
-            boolean isExplicitlyAvailable = availabilityRules.stream()
-                    .anyMatch(rule -> rule.getAvailableSlots() != null && 
-                                    rule.getAvailableSlots().stream()
-                                            .anyMatch(availableSlot -> availableSlot.overlaps(slot)));
-            
-            if (!isExplicitlyAvailable) {
-                return AvailableSlotResponse.SlotInfo.builder()
-                        .timeSlot(slot)
-                        .status(SlotStatus.BLOCKED)
-                        .reason("Not in available time slots")
-                        .isBookable(false)
-                        .availableEmployeeUserIds(new ArrayList<>())
-                        .build();
-            }
-        }
-        
-        // Slot is available with some employees
         return AvailableSlotResponse.SlotInfo.builder()
                 .timeSlot(slot)
-                .status(SlotStatus.AVAILABLE)
-                .reason(null)
-                .isBookable(!availableEmployeeUserIds.isEmpty())
-                .availableEmployeeUserIds(availableEmployeeUserIds)
+                .status(SlotStatus.BLOCKED)
+                .reason(reason)
+                .isBookable(false)
+                .availableEmployeeUserIds(new ArrayList<>())
+                .reservedEmployeeUserIds(new ArrayList<>())
+                .build();
+    }
+    
+    /**
+     * Create expired slot info for past time slots
+     */
+    private AvailableSlotResponse.SlotInfo createPastSlotInfo(TimeSlot slot, LocalDate queryDate) {
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        
+        String reason;
+        if (queryDate.isBefore(currentDate)) {
+            reason = "Date has already passed";
+        } else {
+            reason = "Time slot has already passed";
+        }
+        
+        return AvailableSlotResponse.SlotInfo.builder()
+                .timeSlot(slot)
+                .status(SlotStatus.EXPIRED)
+                .reason(reason)
+                .isBookable(false)
+                .availableEmployeeUserIds(new ArrayList<>())
+                .reservedEmployeeUserIds(new ArrayList<>())
+                .build();
+    }
+    
+    /**
+     * Create blocked slot info when no employees are available
+     */
+    private AvailableSlotResponse.SlotInfo createNoEmployeesSlotInfo(TimeSlot slot) {
+        return AvailableSlotResponse.SlotInfo.builder()
+                .timeSlot(slot)
+                .status(SlotStatus.BLOCKED)
+                .reason("No active employees available")
+                .isBookable(false)
+                .availableEmployeeUserIds(new ArrayList<>())
+                .reservedEmployeeUserIds(new ArrayList<>())
                 .build();
     }
     

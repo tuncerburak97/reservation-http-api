@@ -36,6 +36,9 @@ public class AvailableSlotResponse {
     @Schema(description = "List of booked time slots")
     private List<SlotInfo> bookedSlots;
     
+    @Schema(description = "List of expired time slots")
+    private List<SlotInfo> expiredSlots;
+    
     @Schema(description = "All time slots combined, sorted by time (ascending)")
     private List<SlotInfo> slots;
     
@@ -51,7 +54,7 @@ public class AvailableSlotResponse {
         @Schema(description = "Time slot details")
         private TimeSlot timeSlot;
         
-        @Schema(description = "Current status of the slot", example = "AVAILABLE", allowableValues = {"AVAILABLE", "BOOKED", "BLOCKED"})
+        @Schema(description = "Current status of the slot", example = "AVAILABLE", allowableValues = {"AVAILABLE", "BOOKED", "BLOCKED", "EXPIRED"})
         private SlotStatus status;
         
         @Schema(description = "Reason if slot is blocked or booked", example = "Çalışan izinde")
@@ -63,7 +66,7 @@ public class AvailableSlotResponse {
         @Schema(description = "List of available employee user IDs for this slot")
         private List<String> availableEmployeeUserIds;
         
-        @Schema(description = "Reserved employee user ID (if booked)")
-        private String reservedEmployeeUserId;
+        @Schema(description = "List of Reserved employee user ID (if booked)")
+        private List<String> reservedEmployeeUserIds;
     }
 } 
