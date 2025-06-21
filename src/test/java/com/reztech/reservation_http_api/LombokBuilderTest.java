@@ -2,8 +2,8 @@ package com.reztech.reservation_http_api;
 
 import com.reztech.reservation_http_api.model.entity.embedded.TimeSlot;
 import com.reztech.reservation_http_api.model.entity.main.user.User;
-import com.reztech.reservation_http_api.model.entity.main.business.Owner;
-import com.reztech.reservation_http_api.model.enums.OwnerType;
+import com.reztech.reservation_http_api.model.entity.main.business.Business;
+import com.reztech.reservation_http_api.model.enums.UserType;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -42,37 +42,57 @@ public class LombokBuilderTest {
     
     @Test
     public void testUserBuilder() {
-        // Test User builder
-        User user = User.builder()
-                .name("Test")
-                .surname("User")
-                .email("test@example.com")
-                .gsm("05551234567")
+        // Test User builder with different user types
+        User businessOwner = User.builder()
+                .name("BusinessOwner")
+                .surname("Test")
+                .email("owner@example.com")
+                .gsm("05559876543")
+                .userType(UserType.BUSINESS_OWNER)
                 .build();
-        
-        assertNotNull(user);
-        assertEquals("Test", user.getName());
-        assertEquals("User", user.getSurname());
-        assertEquals("test@example.com", user.getEmail());
-        assertEquals("05551234567", user.getGsm());
+
+        assertNotNull(businessOwner);
+        assertEquals("BusinessOwner", businessOwner.getName());
+        assertEquals("Test", businessOwner.getSurname());
+        assertEquals("owner@example.com", businessOwner.getEmail());
+        assertEquals("05559876543", businessOwner.getGsm());
+        assertEquals(UserType.BUSINESS_OWNER, businessOwner.getUserType());
+
+        // Test Customer user
+        User customer = User.builder()
+                .name("Customer")
+                .surname("Test")
+                .email("customer@example.com")
+                .gsm("05551234567")
+                .userType(UserType.CUSTOMER)
+                .build();
+
+        assertNotNull(customer);
+        assertEquals(UserType.CUSTOMER, customer.getUserType());
     }
     
     @Test
-    public void testOwnerBuilder() {
-        // Test Owner builder
-        Owner owner = Owner.builder()
-                .name("Owner")
-                .lastname("Test")
-                .email("owner@example.com")
+    public void testBusinessBuilder() {
+        // Create a business owner user for testing
+        User owner = User.builder()
+                .name("Business")
+                .surname("Owner")
+                .email("business@example.com")
                 .gsm("05559876543")
-                .ownerType(OwnerType.ADMIN)
+                .userType(UserType.BUSINESS_OWNER)
                 .build();
-        
-        assertNotNull(owner);
-        assertEquals("Owner", owner.getName());
-        assertEquals("Test", owner.getLastname());
-        assertEquals("owner@example.com", owner.getEmail());
-        assertEquals("05559876543", owner.getGsm());
-        assertEquals(OwnerType.ADMIN, owner.getOwnerType());
+
+        // Test Business builder
+        Business business = Business.builder()
+                .name("Test Business")
+                .owner(owner)
+                .build();
+
+        assertNotNull(business);
+        assertEquals("Test Business", business.getName());
+        assertNotNull(business.getOwner());
+        assertEquals("Business", business.getOwner().getName());
+        assertEquals("Owner", business.getOwner().getSurname());
+        assertEquals(UserType.BUSINESS_OWNER, business.getOwner().getUserType());
     }
 } 

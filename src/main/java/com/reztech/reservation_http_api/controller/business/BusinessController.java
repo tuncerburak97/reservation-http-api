@@ -56,7 +56,7 @@ public class BusinessController {
         ),
         @ApiResponse(
             responseCode = "404",
-            description = "Owner not found"
+            description = "User not found or user is not a business owner"
         )
     })
     public ResponseEntity<Business> createBusiness(
@@ -167,14 +167,14 @@ public class BusinessController {
     }
     
     /**
-     * Find businesses by owner ID
-     * @param ownerId Owner ID
+     * Find businesses by owner (user) ID
+     * @param userId User ID (business owner)
      * @return List of businesses
      */
-    @GetMapping("/owner/{ownerId}")
+    @GetMapping("/owner/{userId}")
     @Operation(
-        summary = "Find businesses by owner ID",
-        description = "Retrieves all businesses owned by the specified owner"
+        summary = "Find businesses by owner (user) ID",
+        description = "Retrieves all businesses owned by the specified user (business owner)"
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -187,21 +187,21 @@ public class BusinessController {
         ),
         @ApiResponse(
             responseCode = "404",
-            description = "Owner not found"
+            description = "User not found"
         )
     })
     public ResponseEntity<List<Business>> findByOwnerId(
-        @Parameter(description = "Owner ID", required = true, example = "6507c123456789abcdef0001")
-        @PathVariable String ownerId
+        @Parameter(description = "User ID (business owner)", required = true, example = "6507c123456789abcdef0001")
+        @PathVariable String userId
     ) {
-        log.info("Find businesses by owner id request received for ownerId: {}", ownerId);
-        List<Business> businesses = businessService.findByOwnerId(ownerId);
+        log.info("Find businesses by owner id request received for userId: {}", userId);
+        List<Business> businesses = businessService.findByOwnerId(userId);
         return ResponseEntity.ok(businesses);
     }
     
     /**
      * Search businesses by name
-     * @param name Business name
+     * @param name Business name to search
      * @return List of businesses
      */
     @GetMapping("/search")
@@ -224,14 +224,13 @@ public class BusinessController {
         @RequestParam String name
     ) {
         log.info("Search businesses by name request received for name: {}", name);
-        List<Business> businesses = businessService.searchByName(name);
+        List<Business> businesses = businessService.findByNameContaining(name);
         return ResponseEntity.ok(businesses);
     }
     
     /**
      * Delete business by ID
      * @param id Business ID
-     * @return No content response
      */
     @DeleteMapping("/{id}")
     @Operation(

@@ -2,9 +2,10 @@ package com.reztech.reservation_http_api.service.business;
 
 import com.reztech.reservation_http_api.model.api.request.CreateBusinessRequest;
 import com.reztech.reservation_http_api.model.entity.main.business.Business;
-import com.reztech.reservation_http_api.model.entity.main.business.Owner;
+import com.reztech.reservation_http_api.model.entity.main.user.User;
+import com.reztech.reservation_http_api.model.enums.UserType;
 import com.reztech.reservation_http_api.repository.business.BusinessRepository;
-import com.reztech.reservation_http_api.repository.owner.OwnerRepository;
+import com.reztech.reservation_http_api.repository.user.UserRepository;
 import com.reztech.reservation_http_api.util.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ import java.util.List;
 public class BusinessService {
     
     private final BusinessRepository businessRepository;
-    private final OwnerRepository ownerRepository;
+    private final UserRepository userRepository;
     private final JsonUtils jsonUtils;
     
     /**
@@ -32,18 +33,17 @@ public class BusinessService {
     public Business createBusiness(CreateBusinessRequest request) {
         log.info("Creating business with name: {}", request.getName());
         
-        // Find owner
-        Owner owner = ownerRepository.findById(request.getOwnerId())
-                .orElseThrow(() -> new RuntimeException("Owner not found with id: " + request.getOwnerId()));
-
-        //TODO mapStruct kullan
-        //TODO gerekli doğrulamalar yapıldı mı kontrol edilmelidir? Örnek: mail, sms ..vs
-        Business business = Business.builder()
-                .name(request.getName())
-                .location(request.getLocation())
-                .owner(owner)
-                .contactInfo(request.getContactInfo())
-                .build();
+        // Find user (business owner)
+        User owner = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getUserId()));
+        
+        // Check if user is a business owner
+        if (owner.getUserType() != UserType.BUSINESS_OWNER && owner.getUserType() != UserType.ADMIN) {
+            throw new RuntimeException("User must be a BUSINESS_OWNER or ADMIN to create a business");
+        }
+        
+        Business business = jsonUtils.convert(request, Business.class);
+        business.setOwner(owner);
         
         return businessRepository.save(business);
     }
@@ -70,9 +70,15 @@ public class BusinessService {
         if (request.getContactInfo() != null) {
             existingBusiness.setContactInfo(request.getContactInfo());
         }
-        if (request.getOwnerId() != null) {
-            Owner owner = ownerRepository.findById(request.getOwnerId())
-                    .orElseThrow(() -> new RuntimeException("Owner not found with id: " + request.getOwnerId()));
+        if (request.getUserId() != null) {
+            User owner = userRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getUserId()));
+            
+            // Check if user is a business owner
+            if (owner.getUserType() != UserType.BUSINESS_OWNER && owner.getUserType() != UserType.ADMIN) {
+                throw new RuntimeException("User must be a BUSINESS_OWNER or ADMIN to own a business");
+            }
+            
             existingBusiness.setOwner(owner);
         }
         
@@ -101,25 +107,25 @@ public class BusinessService {
     }
     
     /**
-     * Find businesses by owner ID
-     * @param ownerId Owner ID
-     * @return List of businesses
-     */
-    public List<Business> findByOwnerId(String ownerId) {
-        log.info("Finding businesses by owner id: {}", ownerId);
-        
-        return businessRepository.findByOwnerId(ownerId);
-    }
-    
-    /**
-     * Search businesses by name
+     * Find businesses by name containing (case insensitive)
      * @param name Business name
      * @return List of businesses
      */
-    public List<Business> searchByName(String name) {
-        log.info("Searching businesses by name: {}", name);
+    public List<Business> findByNameContaining(String name) {
+        log.info("Finding businesses by name containing: {}", name);
         
         return businessRepository.findByNameContainingIgnoreCase(name);
+    }
+    
+    /**
+     * Find businesses by owner (user) ID
+     * @param userId User ID (business owner)
+     * @return List of businesses
+     */
+    public List<Business> findByOwnerId(String userId) {
+        log.info("Finding businesses by owner id: {}", userId);
+        
+        return businessRepository.findByOwnerId(userId);
     }
     
     /**

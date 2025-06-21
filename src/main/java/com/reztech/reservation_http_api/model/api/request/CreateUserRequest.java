@@ -2,8 +2,10 @@ package com.reztech.reservation_http_api.model.api.request;
 
 import com.reztech.reservation_http_api.annotation.validator.ValidEmail;
 import com.reztech.reservation_http_api.annotation.validator.ValidGsm;
+import com.reztech.reservation_http_api.model.enums.UserType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,4 +41,8 @@ public class CreateUserRequest {
     @ValidEmail
     @Schema(description = "User's email address", example = "ahmet.yilmaz@example.com", required = true, format = "email")
     private String email;
+
+    @NotNull(message = "User type is required")
+    @Schema(description = "Type of user indicating their role in the system", example = "CUSTOMER", required = true, allowableValues = {"CUSTOMER", "EMPLOYEE", "BUSINESS_OWNER", "ADMIN"})
+    private UserType userType;
 } 

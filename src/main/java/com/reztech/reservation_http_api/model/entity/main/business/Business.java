@@ -2,6 +2,7 @@ package com.reztech.reservation_http_api.model.entity.main.business;
 
 import com.reztech.reservation_http_api.model.entity.embedded.ContactInfo;
 import com.reztech.reservation_http_api.model.entity.embedded.Location;
+import com.reztech.reservation_http_api.model.entity.main.user.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -36,7 +37,7 @@ public class Business {
     //TODO
     // List<Worker> workers; Bu workerlardan biri OWNER tipinde olabilir. ( OWNER == USER_ADMIN )
     //TODO OWNER sisteme yeni kullanıcı ekler ve siler.
-    private Owner owner;
+    private User owner;
     
     private ContactInfo contactInfo;
 } 

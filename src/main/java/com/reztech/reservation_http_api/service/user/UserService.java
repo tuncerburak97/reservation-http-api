@@ -6,6 +6,7 @@ import com.reztech.reservation_http_api.core.exception.BusinessException;
 import com.reztech.reservation_http_api.core.exception.ResourceNotFoundException;
 import com.reztech.reservation_http_api.model.api.request.CreateUserRequest;
 import com.reztech.reservation_http_api.model.entity.main.user.User;
+import com.reztech.reservation_http_api.model.enums.UserType;
 import com.reztech.reservation_http_api.repository.user.UserRepository;
 import com.reztech.reservation_http_api.util.JsonUtils;
 import lombok.RequiredArgsConstructor;
@@ -70,6 +71,9 @@ public class UserService {
         if (request.getEmail() != null) {
             existingUser.setEmail(request.getEmail());
         }
+        if (request.getUserType() != null) {
+            existingUser.setUserType(request.getUserType());
+        }
         
         return userRepository.save(existingUser);
     }
@@ -107,6 +111,31 @@ public class UserService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND, 
                     String.format(ErrorMessage.USER_NOT_FOUND_BY_EMAIL, email)));
+    }
+
+    /**
+     * Find users by type
+     * @param userType User type
+     * @return List of users
+     */
+    public List<User> findByUserType(UserType userType) {
+        log.info("Finding users by type: {}", userType);
+        
+        return userRepository.findByUserType(userType);
+    }
+
+    /**
+     * Find user by email and user type
+     * @param email User email
+     * @param userType User type
+     * @return User
+     */
+    public User findByEmailAndUserType(String email, UserType userType) {
+        log.info("Finding user by email: {} and type: {}", email, userType);
+        
+        return userRepository.findByEmailAndUserType(email, userType)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND, 
+                    String.format("User not found with email: %s and type: %s", email, userType)));
     }
     
     /**

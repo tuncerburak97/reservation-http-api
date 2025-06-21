@@ -1,5 +1,6 @@
 package com.reztech.reservation_http_api.model.entity.main.user;
 
+import com.reztech.reservation_http_api.model.enums.UserType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -30,7 +31,9 @@ public class User {
     //@Indexed(unique = true)
     private String email;
 
-    //private UserRole role; // CUSTOMER, EMPLOYEE, OWNER
+    //@Indexed
+    private UserType userType; // CUSTOMER, EMPLOYEE, BUSINESS_OWNER, ADMIN
+
     //TODO password bilgisi olabilir mi ?
 
     //TODO kullanıcı üye olduysa eğer

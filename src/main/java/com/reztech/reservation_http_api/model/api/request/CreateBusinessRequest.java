@@ -32,9 +32,9 @@ public class CreateBusinessRequest {
     @Schema(description = "Business location information", required = true)
     private Location location;
     
-    @NotBlank(message = "Owner ID is required")
-    @Schema(description = "ID of the business owner", example = "6507c123456789abcdef0001", required = true)
-    private String ownerId;
+    @NotBlank(message = "User ID is required")
+    @Schema(description = "ID of the business owner (user with BUSINESS_OWNER type)", example = "6507c123456789abcdef0001", required = true)
+    private String userId;
     
     @Valid
     @Schema(description = "Business contact information")

@@ -2,6 +2,7 @@ package com.reztech.reservation_http_api.controller.user;
 
 import com.reztech.reservation_http_api.model.api.request.CreateUserRequest;
 import com.reztech.reservation_http_api.model.entity.main.user.User;
+import com.reztech.reservation_http_api.model.enums.UserType;
 import com.reztech.reservation_http_api.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -196,6 +197,71 @@ public class UserController {
     ) {
         log.info("Find user by email request received for email: {}", email);
         User user = userService.findByEmail(email);
+        return ResponseEntity.ok(user);
+    }
+
+    /**
+     * Find users by type
+     * @param userType User type
+     * @return List of users
+     */
+    @GetMapping("/type/{userType}")
+    @Operation(
+        summary = "Find users by type",
+        description = "Retrieves all users of a specific type (CUSTOMER, EMPLOYEE, BUSINESS_OWNER, ADMIN)"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Users found successfully",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = User.class)
+            )
+        )
+    })
+    public ResponseEntity<List<User>> findByUserType(
+        @Parameter(description = "User type", required = true, example = "BUSINESS_OWNER")
+        @PathVariable UserType userType
+    ) {
+        log.info("Find users by type request received for type: {}", userType);
+        List<User> users = userService.findByUserType(userType);
+        return ResponseEntity.ok(users);
+    }
+
+    /**
+     * Find user by email and type
+     * @param email User email
+     * @param userType User type
+     * @return User
+     */
+    @GetMapping("/email/{email}/type/{userType}")
+    @Operation(
+        summary = "Find user by email and type",
+        description = "Retrieves a specific user by their email address and user type"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "User found successfully",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = User.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "User not found"
+        )
+    })
+    public ResponseEntity<User> findByEmailAndUserType(
+        @Parameter(description = "User email address", required = true, example = "owner@business.com")
+        @PathVariable String email,
+        @Parameter(description = "User type", required = true, example = "BUSINESS_OWNER")
+        @PathVariable UserType userType
+    ) {
+        log.info("Find user by email: {} and type: {} request received", email, userType);
+        User user = userService.findByEmailAndUserType(email, userType);
         return ResponseEntity.ok(user);
     }
     

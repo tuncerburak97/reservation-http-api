@@ -14,12 +14,12 @@ import java.util.List;
 public interface BusinessRepository extends MongoRepository<Business, String> {
     
     /**
-     * Find businesses by owner ID
-     * @param ownerId Owner ID
+     * Find businesses by owner (user) ID
+     * @param userId User ID (business owner)
      * @return List of businesses
      */
     @Query("{'owner.id': ?0}")
-    List<Business> findByOwnerId(String ownerId);
+    List<Business> findByOwnerId(String userId);
     
     /**
      * Find businesses by name containing (case insensitive)
